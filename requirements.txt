@@ -5,3 +5,8 @@ blinker==1.7.0
 beautifulsoup4
 pandas
 openpyxl
+groq
+marker-pdf
+torch 
+torchvision 
+torchaudio
