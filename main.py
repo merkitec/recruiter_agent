@@ -4,14 +4,32 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.keys import Keys
-
+import json_repair
+import logging
+from logging.handlers import RotatingFileHandler
 import time
+import os
 from dotenv import find_dotenv, load_dotenv
 import argparse
 from argparse import Namespace
+from bs4 import BeautifulSoup
 
 from process_document import extract_json, extract_markdown
 load_dotenv(find_dotenv())
+
+# Configure logging
+os.makedirs("logs", exist_ok=True)
+logging.basicConfig(level=logging.INFO, 
+                    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+                    handlers=[RotatingFileHandler('logs/my_log.log', maxBytes=1000000, backupCount=10,)],
+                    datefmt='%Y-%m-%dT%H:%M:%S')
+logger = logging.getLogger(__name__)
+logging.getLogger("seleniumwire.server").setLevel(level=logging.WARNING)
+logging.getLogger("seleniumwire.handler").setLevel(level=logging.WARNING)
+
+def __extract_json_from_response(response: str):
+    json = response[response.index("```json"):-3]
+    return json_repair.loads(json)
 
 def get_perfil(file_path):
     # Obtiene el nombre del puesto del documento con el Perfil solicitado
@@ -19,7 +37,7 @@ def get_perfil(file_path):
 
     json_perfil = extract_json(content=text)
 
-    return json_perfil
+    return __extract_json_from_response(json_perfil)
 
 def main(args):
     # json_perfil = get_perfil("docs/Perfil de Analista de Producción[1].pdf")
@@ -66,13 +84,31 @@ def main(args):
     job_title_input.clear()
     job_title_input.send_keys(json_perfil['Perfil'])
     job_title_input.send_keys(Keys.ARROW_DOWN)
-    first_option =wait.until(ec.visibility_of_element_located((By.CSS_SELECTOR, "ul.typeahead-results li")))
-    first_option.send_keys(Keys.RETURN)
+    job_title_list_items = wait.until(ec.visibility_of_any_elements_located((By.CSS_SELECTOR, "ul[aria-label='Typeahead results'][role='listbox'].typeahead-results li")))
+    first_option = job_title_list_items[0]
+    job_title_input.send_keys(Keys.RETURN)
 
     search = driver.find_element(By.XPATH, '//*[@id="search-wrapper"]/section[3]/header/div/button[2]')
     wait.until(lambda d : search.is_displayed())
     search.click()
 
+    # Scrap the results
+    search_result = wait.until(ec.visibility_of_all_elements_located((By.XPATH, "div[@class='profile-list profile-list-container']/form/ol/li")))
+    for item in search_result:
+        logger.debug(item.get_attribute("outerHTML"))
+        soup = BeautifulSoup(item.get_attribute("outerHTML"), 'html.parser')
+
+        result_item_info = {
+            "name": soup.find("div>article label>span[class='ally-text']").text,
+            "img": soup.find("article[class='row--vertical row'] img").attrs['src'],
+            "profile_url": soup.find("section[class='lockup'] a").attrs['href'],
+            "job_title": soup.find("section[class='lockup'] div[class='artdeco-entity-lockup__subtitle ember-view']>span>em").text,
+            "location": soup.find("section[class='lockup'] div[class='artdeco-entity-lockup__metadata ember-view']>div").text,
+            "industry": soup.find("section[class='lockup'] div[class='artdeco-entity-lockup__metadata ember-view']>span").text,
+            "experience": soup.find("div[class='history'] span[class='history-group__header-item']").text,
+            "previous": [p.text for p in soup.find_all("div[class='expandable-list']>ol>li")],
+            "education": ",".join([p.text for p in soup.find_all("div[class='history'] ol[class='history-group__list-items']>li")])
+        }
     time.sleep(20)
     driver.quit()
 

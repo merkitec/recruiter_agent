@@ -10,3 +10,4 @@ marker-pdf
 torch 
 torchvision 
 torchaudio
+json-repair
