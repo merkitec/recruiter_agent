@@ -6,3 +6,5 @@ __pycache__/
 *.pyc
 *.spec
 .env
+logs/
+results/
