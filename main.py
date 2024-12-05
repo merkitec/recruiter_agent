@@ -28,6 +28,7 @@ logging.basicConfig(level=logging.DEBUG,
 logger = logging.getLogger(__name__)
 logging.getLogger("seleniumwire.server").setLevel(level=logging.WARNING)
 logging.getLogger("seleniumwire.handler").setLevel(level=logging.WARNING)
+logging.getLogger("hpack.hpack").setLevel(level=logging.WARNING)
 
 def __extract_json_from_response(response: str):
     json = response[response.index("```json"):-3]
@@ -53,8 +54,9 @@ def save_results(file_path, notifications, id_name_part):
 def main(args):
     # json_perfil = get_perfil("docs/Perfil de Analista de Producción[1].pdf")
     json_perfil = get_perfil(args.perfil_doc)
-    opciones = webdriver.ChromeOptions()
+    logger.info("Finished process of Perfil document")
 
+    opciones = webdriver.ChromeOptions()
     opciones.add_experimental_option("excludeSwitches",['enable-automation'])
     prefs = {"credentials_enable_service": False,"profile.password_manager_enabled": False}
     opciones.add_experimental_option("prefs", prefs)
@@ -84,6 +86,7 @@ def main(args):
     wait.until(lambda d : advanced_filters.is_displayed())
     advanced_filters.click()
     time.sleep(5)
+    logger.info("time.sleep(5)")
 
     # search_params = driver.find_elements(By.CSS_SELECTOR, 'section.facets-container>div>div>div>div>div>section.search-facet>button.facet-edit-button')
     # job_title = [p for p in search_params if p.text.startwith("Job title")][0]
@@ -99,6 +102,7 @@ def main(args):
     first_option = job_title_list_items[0]
     job_title_input.send_keys(Keys.RETURN)
 
+    logger.info("Before click search button")
     search = driver.find_element(By.XPATH, '//*[@id="search-wrapper"]/section[3]/header/div/button[2]')
     wait.until(lambda d : search.is_displayed())
     search.click()
@@ -107,6 +111,7 @@ def main(args):
     wait.until(lambda d : pages_index.is_displayed())
     time.sleep(20)
 
+    logger.info("Before process of the search results")
     # Scrap the results
     search_result = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//*[@id="results-container"]/span/div/form/ol/li')))
     items = []
@@ -129,9 +134,11 @@ def main(args):
         except Exception as ex:
             logger.error(ex)    
 
+    logger.info("Before saving the results")
     save_results('./results', items, json_perfil['Perfil'])
     time.sleep(20)
     driver.quit()
+    logger.info("Finish process")
 
 def parse_opt():
     parser = argparse.ArgumentParser(description='Image Yolo Dataset Generator for TASA Fase 2 Project.')
@@ -143,6 +150,7 @@ def parse_opt():
 if __name__ == "__main__":
     parser = parse_opt()
     args = parser.parse_args()
+    logger.info(f"Args: {args}")
     if isinstance(args, Namespace):
         main(args)
     else:
