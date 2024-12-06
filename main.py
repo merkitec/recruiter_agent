@@ -70,7 +70,9 @@ def main(args):
 
     # Go to the Recruiter LinkedIn Login Page
     driver.get('https://www.linkedin.com/uas/login-cap?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fhome&source_app=tsweb&trk=tsweb_signin')
-
+    # driver.get("https://www.linkedin.com/talent/contract-chooser?trk=nav_account_sub_nav_cap&&lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BKWYMhIBGRiivEjSVFcJipg%3D%3D")
+    # driver.get("https://www.linkedin.com/checkpoint/enterprise/login/385782674?application=recruiter&appInstanceId=493802994&redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fcontract-chooser%3FcontractId%3D2005770235%26enterpriseAccountId%3D385782674%26enterpriseProfileId%3D398773681%26enterpriseApplicationInstanceId%3D493802994")
+    # driver.get("https://www.linkedin.com/checkpoint/enterprise/login/385782674?application=recruiter&appInstanceId=493802994&redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fcontract-chooser%3FcontractId%3D2005770235%26enterpriseAccountId%3D385782674%26enterpriseProfileId%3D398773681%26enterpriseApplicationInstanceId%3D493802994")
     wait.until(ec.visibility_of_element_located((By.XPATH,'//*[@id="app__container"]/main/div[2]/form/div[3]/button')))
 
     # Login
@@ -109,7 +111,7 @@ def main(args):
     driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
     pages_index = wait.until(ec.visibility_of_element_located((By.CSS_SELECTOR, "ol.pagination__list")))
     wait.until(lambda d : pages_index.is_displayed())
-    time.sleep(20)
+    time.sleep(8)
 
     logger.info("Before process of the search results")
     # Scrap the results
@@ -136,14 +138,14 @@ def main(args):
 
     logger.info("Before saving the results")
     save_results('./results', items, json_perfil['Perfil'])
-    time.sleep(20)
+    time.sleep(5)
     driver.quit()
     logger.info("Finish process")
 
 def parse_opt():
     parser = argparse.ArgumentParser(description='Image Yolo Dataset Generator for TASA Fase 2 Project.')
     parser.add_argument('--perfil_doc', dest='perfil_doc', action='store', 
-                        default="", 
+                        default="docs/Perfil-Administrative-Assistant.pdf", 
                         help='PDF file, containing information about profile to search', required=True)
     return parser
     
