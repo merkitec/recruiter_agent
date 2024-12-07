@@ -79,7 +79,7 @@ def main(args):
     wait = WebDriverWait(driver, 60)
 
     # Go to the Recruiter LinkedIn Login Page
-    driver.get('https://www.linkedin.com/uas/login-cap?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fhome&source_app=tsweb&trk=tsweb_signin')
+    driver.get('https://www.linkedin.com/talent/contract-chooser?trk=nav_account_sub_nav_cap&&lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BIUExonRgT3O1xSq9WWzJhA%3D%3D')
     # driver.get("https://www.linkedin.com/talent/contract-chooser?trk=nav_account_sub_nav_cap&&lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BKWYMhIBGRiivEjSVFcJipg%3D%3D")
     # driver.get("https://www.linkedin.com/checkpoint/enterprise/login/385782674?application=recruiter&appInstanceId=493802994&redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fcontract-chooser%3FcontractId%3D2005770235%26enterpriseAccountId%3D385782674%26enterpriseProfileId%3D398773681%26enterpriseApplicationInstanceId%3D493802994")
     # driver.get("https://www.linkedin.com/checkpoint/enterprise/login/385782674?application=recruiter&appInstanceId=493802994&redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fcontract-chooser%3FcontractId%3D2005770235%26enterpriseAccountId%3D385782674%26enterpriseProfileId%3D398773681%26enterpriseApplicationInstanceId%3D493802994")
