@@ -13,3 +13,4 @@ marker-pdf
 json-repair
 megaparse
 python-magic-bin
+pymupdf4llm

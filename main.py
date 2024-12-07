@@ -1,4 +1,3 @@
-import json
 from seleniumwire import webdriver  # Import from seleniumwire
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -6,12 +5,11 @@ from selenium.webdriver.support import expected_conditions as ec
 from selenium.webdriver.common.keys import Keys
 import json_repair
 import logging
-from logging.handlers import RotatingFileHandler, TimedRotatingFileHandler
+from logging.handlers import TimedRotatingFileHandler
 import time
 from datetime import datetime
 import os
 from dotenv import find_dotenv, load_dotenv
-import argparse
 from argparse import Namespace
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -20,6 +18,7 @@ from application.extract_markdown import ExtractMarkdown
 from common.parameter_arguments import parse_opt
 from infrastructure.marker_extract_markdown import MarkerExtractMarkdown
 from infrastructure.megaparse_extract_markdown import MegaParseExtractMarkdown
+from infrastructure.py_mu_pdf__4llm import PyMuPdf4Llm
 from process_document import extract_json, extract_markdown
 load_dotenv(find_dotenv())
 
@@ -59,6 +58,8 @@ def __get_markdown_extractor(args) -> ExtractMarkdown:
         return MarkerExtractMarkdown()
     if args.markdown_extractor == "megaparse":
         return MegaParseExtractMarkdown()
+    if args.markdown_extractor == "pymupdf4llm":
+        return PyMuPdf4Llm()
 
 def main(args):
     # json_perfil = get_perfil("docs/Perfil de Analista de Producción[1].pdf")
