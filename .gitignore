@@ -9,3 +9,4 @@ __pycache__/
 logs/
 results/
 *.exe
+__pycache__/process_document.cpython-311.pyc

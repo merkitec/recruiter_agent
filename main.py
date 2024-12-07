@@ -16,6 +16,10 @@ from argparse import Namespace
 from bs4 import BeautifulSoup
 import pandas as pd
 
+from application.extract_markdown import ExtractMarkdown
+from common.parameter_arguments import parse_opt
+from infrastructure.marker_extract_markdown import MarkerExtractMarkdown
+from infrastructure.megaparse_extract_markdown import MegaParseExtractMarkdown
 from process_document import extract_json, extract_markdown
 load_dotenv(find_dotenv())
 
@@ -31,17 +35,16 @@ logging.getLogger("seleniumwire.handler").setLevel(level=logging.WARNING)
 logging.getLogger("hpack.hpack").setLevel(level=logging.WARNING)
 
 def __extract_json_from_response(response: str):
-    json = response[response.index("```json"):-3]
-    return json_repair.loads(json)
+    # json = response[response.index("```json"):-3]
+    return json_repair.loads(response)
 
-def get_perfil(file_path):
+def get_perfil(file_path, extractor:ExtractMarkdown):
     # Obtiene el nombre del puesto del documento con el Perfil solicitado
-    text, _, images = extract_markdown(file_path=file_path)
-
+    text = extract_markdown(file_path=file_path, extractor=extractor)
+    logger.debug(text)
     json_perfil = extract_json(content=text)
-
+    logger.debug(json_perfil)
     return __extract_json_from_response(json_perfil)
-
 
 def save_results(file_path, notifications, id_name_part):   
     os.makedirs(file_path, exist_ok=True)
@@ -51,9 +54,15 @@ def save_results(file_path, notifications, id_name_part):
     df = pd.DataFrame(notifications)
     df.to_excel(f"{file_path}/perfiles_{id_name_part}_{datetime.now().strftime('%Y.%m.%d_%H.%M.%S')}.xlsx")
 
+def __get_markdown_extractor(args) -> ExtractMarkdown:
+    if args.markdown_extractor == "marker":
+        return MarkerExtractMarkdown()
+    if args.markdown_extractor == "megaparse":
+        return MegaParseExtractMarkdown()
+
 def main(args):
     # json_perfil = get_perfil("docs/Perfil de Analista de Producción[1].pdf")
-    json_perfil = get_perfil(args.perfil_doc)
+    json_perfil = get_perfil(args.perfil_doc, __get_markdown_extractor(args))
     logger.info("Finished process of Perfil document")
 
     opciones = webdriver.ChromeOptions()
@@ -142,17 +151,12 @@ def main(args):
     driver.quit()
     logger.info("Finish process")
 
-def parse_opt():
-    parser = argparse.ArgumentParser(description='Image Yolo Dataset Generator for TASA Fase 2 Project.')
-    parser.add_argument('--perfil_doc', dest='perfil_doc', action='store', 
-                        default="docs/Perfil-Administrative-Assistant.pdf", 
-                        help='PDF file, containing information about profile to search', required=True)
-    return parser
-    
+   
 if __name__ == "__main__":
     parser = parse_opt()
     args = parser.parse_args()
     logger.info(f"Args: {args}")
+
     if isinstance(args, Namespace):
         main(args)
     else:

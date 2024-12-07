@@ -6,8 +6,10 @@ beautifulsoup4
 pandas
 openpyxl
 groq
-marker-pdf
 torch 
 torchvision 
 torchaudio
+marker-pdf
 json-repair
+megaparse
+python-magic-bin

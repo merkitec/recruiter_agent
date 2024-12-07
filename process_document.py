@@ -1,6 +1,10 @@
 import os
+from application.extract_markdown import ExtractMarkdown
+
 from dotenv import find_dotenv, load_dotenv
 load_dotenv(find_dotenv())
+
+from groq import Groq
 
 prompt = """
 Se te proporcionará el texto de un documento que describe un perfil laboral. El documento contiene las siguientes secciones: **Título**, **Organigrama**, **Funciones**, **Requisitos** y **Condiciones Laborales**. Tu tarea es extraer la información relevante y organizarla en un objeto JSON con el siguiente formato:
@@ -87,19 +91,18 @@ Texto del documento que describe el perfil laboral a analizar:
 {input_user}
 """
 
-from marker.converters.pdf import PdfConverter
-from marker.models import create_model_dict
-from marker.output import text_from_rendered
+# from marker.converters.pdf import PdfConverter
+# from marker.models import create_model_dict
+# from marker.output import text_from_rendered
 
-def extract_markdown(file_path:str):
-    converter = PdfConverter(
-        artifact_dict=create_model_dict(),
-    )
-    rendered = converter(file_path)
-    # text, _, images = text_from_rendered(rendered)
-    return text_from_rendered(rendered)
-
-from groq import Groq
+def extract_markdown(file_path:str, extractor: ExtractMarkdown):
+    # converter = PdfConverter(
+    #     artifact_dict=create_model_dict(),
+    # )
+    # rendered = converter(file_path)
+    # # text, _, images = text_from_rendered(rendered)
+    # return text_from_rendered(rendered)
+    return extractor.extract(file_path)
 
 def extract_json(content: str):
     client = Groq(
