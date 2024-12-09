@@ -2,7 +2,7 @@ import argparse
 from argparse import Namespace
 
 def parse_opt():
-    parser = argparse.ArgumentParser(description='Image Yolo Dataset Generator for TASA Fase 2 Project.')
+    parser = argparse.ArgumentParser(description='Automatic data extraction using LinkedIn Recruiter Lite')
     parser.add_argument('--perfil_doc', dest='perfil_doc', action='store', 
                         default="docs/Perfil-Administrative-Assistant.pdf", 
                         help='PDF file, containing information about profile to search', required=True)
