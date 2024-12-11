@@ -24,7 +24,7 @@ Se te proporcionará el texto de un documento que describe un perfil laboral. El
         'Item 1 de la sección Requisitos',
         'Item 2 de la sección Requisitos'
     ],
-    'Condiciones_laborales': [
+    'Condiciones Laborales': [
         'Item 1 de la sección Condiciones Laborales',
         'Item 2 de la sección Condiciones Laborales'
     ]
@@ -38,6 +38,7 @@ Se te proporcionará el texto de un documento que describe un perfil laboral. El
 4. **Requisitos:** Extrae las competencias, habilidades, experiencia y formación requeridas para el perfil, y organízalos en la lista `"Requisitos"`.
 5. **Condiciones Laborales:** Identifica aspectos relacionados con horarios, ubicación, beneficios y otros términos laborales, y organízalos en la lista `"Condiciones_laborales"`.
 6. No incluyas ningun comentario adicional en el resultado de la extracción, responde unicamente con el objeto JSON
+7. Si te indican "[Lugar] o aledaños", "[Lugar] o disponibilidad de traslado u otros, tendrías que incluir solo "Lugar" como Ubicación, ya que esta palabra me sirve como filtro de lugar.
 
 ### Ejemplo:
 Si el texto proporcionado describe un "Perfil de Analista de Producción" con las siguientes secciones:
@@ -57,9 +58,10 @@ Perfil de Analista de Producción
 - Bachiller de Ingeniería Industrial.  
 - 3 años de experiencia.  
 
-**Condiciones Laborales:**  
-- Régimen MYPE.  
-- Sueldo fijo (2600 máx).  
+**Condiciones Laborales:**
+- (Solo) Lima. (Ignorar la posibilidad de traslado e indicar el lugar en concreto)
+- Régimen MYPE.
+- Sueldo fijo (2600 máx).
 
 El resultado JSON debe ser:
 
@@ -78,9 +80,11 @@ El resultado JSON debe ser:
         "Bachiller de Ingeniería Industrial.",
         "3 años de experiencia."
     ],
-    "Condiciones_laborales": [
+    "Condiciones Laborales": [
+        {"Ubicación": "Lima"},
         "Régimen MYPE.",
-        "Sueldo fijo (2600 máx)."
+        "Sueldo fijo (2600 máx).",
+        ... (otros)
     ]
 }
 ```

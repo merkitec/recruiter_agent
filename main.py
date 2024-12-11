@@ -64,13 +64,14 @@ def __get_markdown_extractor(args) -> ExtractMarkdown:
 def main(args):
     # json_perfil = get_perfil("docs/Perfil de Analista de Producción[1].pdf")
     json_perfil = get_perfil(args.perfil_doc, __get_markdown_extractor(args))
+    print(json_perfil)
     logger.info("Finished process of Perfil document")
 
     opciones = webdriver.ChromeOptions()
     opciones.add_experimental_option("excludeSwitches",['enable-automation'])
     prefs = {"credentials_enable_service": False,"profile.password_manager_enabled": False}
     opciones.add_experimental_option("prefs", prefs)
-    opciones.add_argument("user-data-dir=C:\\Users\\\ytamayo\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 3")
+    opciones.add_argument("user-data-dir=C:\\Users\\ytamayo\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 3")
 
     # Create a new instance of the Chrome driver
     driver = webdriver.Chrome(options=opciones)
@@ -79,25 +80,26 @@ def main(args):
     wait = WebDriverWait(driver, 60)
 
     # Go to the Recruiter LinkedIn Login Page
-    driver.get('https://www.linkedin.com/talent/contract-chooser?trk=nav_account_sub_nav_cap&&lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BIUExonRgT3O1xSq9WWzJhA%3D%3D')
+    #driver.get('https://www.linkedin.com/uas/login-cap?session_redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fhome&source_app=tsweb&trk=tsweb_signin')
+    #driver.get('https://www.linkedin.com/talent/contract-chooser?trk=nav_account_sub_nav_cap&&lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BIUExonRgT3O1xSq9WWzJhA%3D%3D')
+    driver.get('https://www.linkedin.com/login-cap')
     # driver.get("https://www.linkedin.com/talent/contract-chooser?trk=nav_account_sub_nav_cap&&lipi=urn%3Ali%3Apage%3Ad_flagship3_feed%3BKWYMhIBGRiivEjSVFcJipg%3D%3D")
     # driver.get("https://www.linkedin.com/checkpoint/enterprise/login/385782674?application=recruiter&appInstanceId=493802994&redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fcontract-chooser%3FcontractId%3D2005770235%26enterpriseAccountId%3D385782674%26enterpriseProfileId%3D398773681%26enterpriseApplicationInstanceId%3D493802994")
     # driver.get("https://www.linkedin.com/checkpoint/enterprise/login/385782674?application=recruiter&appInstanceId=493802994&redirect=https%3A%2F%2Fwww.linkedin.com%2Ftalent%2Fcontract-chooser%3FcontractId%3D2005770235%26enterpriseAccountId%3D385782674%26enterpriseProfileId%3D398773681%26enterpriseApplicationInstanceId%3D493802994")
     wait.until(ec.visibility_of_element_located((By.XPATH,'//*[@id="app__container"]/main/div[2]/form/div[3]/button')))
-
     # Login
     username = driver.find_element(By.XPATH, '//*[@id="username"]')
     username.clear()
     username.send_keys("yhairt@hotmail.com")
     driver.find_element(By.XPATH, '//*[@id="password"]').send_keys("dni29562275")
     driver.find_element(By.XPATH, '//*[@id="app__container"]/main/div[2]/form/div[3]/button').click()
-    time.sleep(8)
+    time.sleep(20)
 
     # Begin a Search for talent
-    advanced_filters = driver.find_element(By.XPATH, '//*[@id="application-wrapper"]/div[5]/div/div/header/div[2]/ul/li[1]')
+    advanced_filters = wait.until(ec.presence_of_element_located((By.XPATH, '//*[@id="application-wrapper"]/div[5]/div/div/header/div[2]/ul/li[1]')))
     wait.until(lambda d : advanced_filters.is_displayed())
     advanced_filters.click()
-    time.sleep(5)
+    time.sleep(10)
     logger.info("time.sleep(5)")
 
     # search_params = driver.find_elements(By.CSS_SELECTOR, 'section.facets-container>div>div>div>div>div>section.search-facet>button.facet-edit-button')
@@ -109,23 +111,52 @@ def main(args):
     job_title_input = driver.find_element(By.XPATH, 'html//body/div[4]/div[5]/div/div/div[5]/div[1]/section[3]/div/main/div/section/div[1]/div[1]/div/div/div/section/form/div[1]/div[1]/div[1]/div/input')
     job_title_input.clear()
     job_title_input.send_keys(json_perfil['Perfil'])
+    #job_title_list_items = wait.until(ec.visibility_of_any_elements_located((By.CSS_SELECTOR, "ul[aria-label='Typeahead results'][role='listbox'].typeahead-results li")))
+    job_title_list_items = wait.until(ec.visibility_of_any_elements_located((By.CSS_SELECTOR, "ul[aria-label='Resultados de escritura anticipada'][role='listbox'].typeahead-results li")))
     job_title_input.send_keys(Keys.ARROW_DOWN)
-    job_title_list_items = wait.until(ec.visibility_of_any_elements_located((By.CSS_SELECTOR, "ul[aria-label='Typeahead results'][role='listbox'].typeahead-results li")))
     first_option = job_title_list_items[0]
     job_title_input.send_keys(Keys.RETURN)
+    job_title_input.send_keys(Keys.ESCAPE)
 
+    job_location = driver.find_elements(By.XPATH, 'html//body/div[4]/div[5]/div/div/div[5]/div[1]/section[3]/div/main/div/section/div[1]/div[2]/div/div/div/section/button')
+    wait.until(lambda d : job_location[0].is_displayed())
+    job_location[0].click()
+
+    job_location_input = driver.find_element(By.XPATH, 'html//body/div[4]/div[5]/div/div/div[5]/div[1]/section[3]/div/main/div/section/div[1]/div[2]/div/div/div/section/form/div[1]/div[1]/div[1]/div/input')
+    job_location_input.clear()
+    job_location_input.send_keys(json_perfil['Condiciones Laborales'][0]['Ubicación'])
+    #job_location_list_items = wait.until(ec.visibility_of_any_elements_located((By.CSS_SELECTOR, "ul[aria-label='Typeahead results'][role='listbox'].typeahead-results li")))
+    job_location_list_items = wait.until(ec.visibility_of_any_elements_located((By.CSS_SELECTOR, "ul[aria-label='Resultados de escritura anticipada'][role='listbox'].typeahead-results li")))
+    job_location_input.send_keys(Keys.ARROW_DOWN)
+    first_option = job_location_list_items[0]
+    job_location_input.send_keys(Keys.RETURN)
+    job_location_input.send_keys(Keys.ESCAPE)
+
+    time.sleep(3)
     logger.info("Before click search button")
     search = driver.find_element(By.XPATH, '//*[@id="search-wrapper"]/section[3]/header/div/button[2]')
     wait.until(lambda d : search.is_displayed())
     search.click()
-    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-    pages_index = wait.until(ec.visibility_of_element_located((By.CSS_SELECTOR, "ol.pagination__list")))
-    wait.until(lambda d : pages_index.is_displayed())
-    time.sleep(8)
+    
+    #WebDriverWait(driver, 10).until(ec.presence_of_element_located((By.TAG_NAME, "body")))
+    
 
     logger.info("Before process of the search results")
     # Scrap the results
     search_result = wait.until(ec.visibility_of_all_elements_located((By.XPATH, '//*[@id="results-container"]/span/div/form/ol/li')))
+
+    # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    # pages_index = driver.find_element(By.CSS_SELECTOR, "li.pagination__link.selected")
+    # wait.until(lambda d : pages_index.is_displayed())
+    # pages_index.click()
+
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    pages_index = wait.until(ec.visibility_of_element_located((By.CSS_SELECTOR, "ol.pagination__list")))
+    wait.until(lambda d : pages_index.is_displayed())
+    pages_index = driver.find_element(By.CSS_SELECTOR, "li.pagination__link.selected")
+    wait.until(lambda d : pages_index.is_displayed())
+    pages_index.click()
+
     items = []
     for item in search_result:
         logger.debug(item.get_attribute("outerHTML"))
