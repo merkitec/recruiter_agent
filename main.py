@@ -99,7 +99,7 @@ def main(args):
     advanced_filters = wait.until(ec.presence_of_element_located((By.XPATH, '//*[@id="application-wrapper"]/div[5]/div/div/header/div[2]/ul/li[1]')))
     wait.until(lambda d : advanced_filters.is_displayed())
     advanced_filters.click()
-    time.sleep(10)
+    time.sleep(5)
     logger.info("time.sleep(5)")
 
     # search_params = driver.find_elements(By.CSS_SELECTOR, 'section.facets-container>div>div>div>div>div>section.search-facet>button.facet-edit-button')
